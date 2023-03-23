@@ -110,6 +110,8 @@ public class Robot extends TimedRobot {
       private boolean squezed;
       private boolean turn2;
       private boolean ppiece2;
+      private boolean inpositiontoplacepiece;
+      private boolean placedpiece;
 
       private double dpos;
       private double dtmos;
@@ -240,6 +242,10 @@ public class Robot extends TimedRobot {
 
    // this tell us we are ready to place piece 2
    ppiece2 = false;
+
+   inpositiontoplacepiece = false;
+
+   placedpiece = false;
 
   }
 
@@ -458,11 +464,11 @@ public class Robot extends TimedRobot {
           // this tells it to drive from are starting position till we get up next to the Nodes and it tells it when it is in position
           if ( start_position == true && ipotpp1 == false ) {
               
-              if (dpos>.1){
+              if (dpos > .05){
                   dtmos=.21*direction;
                   }
               
-              else if (dpos < .1) {
+              else if (dpos < .05) {
                   dtmos=0;
                   ipotpp1=true;
               }
@@ -504,6 +510,16 @@ public class Robot extends TimedRobot {
                   armlowered = true;
               }
 
+                if (drivetrain.m_gyro.getYaw() > 1 ){
+               dtmot = -.05 * turndirection;
+                }
+               else if ( drivetrain.m_gyro.getYaw()  < -1 ){
+               dtmot = .05 * turndirection;
+               
+                }
+                else {
+                  dtmot = 0;
+                }
           }
 
               //This speads us up when the arm lowers
@@ -538,7 +554,7 @@ public class Robot extends TimedRobot {
                 dtmos = 0;
                 inpositionpickup = true;
               }
-
+              
           }
 
           if (inpositionpickup == true && squezed == false){
@@ -547,13 +563,13 @@ public class Robot extends TimedRobot {
             squezed = true;
           }
 
-          if (squezed == true && Hand.hande.getPosition() > -4 && turn2 == false){
+          if (squezed == true && Hand.hande.getPosition() < -4 && turn2 == false){
            
             
-            if (drivetrain.m_gyro.getYaw() < 360 ){
+            if (drivetrain.m_gyro.getAngle() < 360 ){
               dtmot = .21 * turndirection;
           }
-          else if (drivetrain.m_gyro.getYaw() >= 360){
+           if (drivetrain.m_gyro.getAngle() >= 360){
               dtmot = 0;
               turn2 = true;
               wrist.Wsetpoint = 3.8;
@@ -569,15 +585,18 @@ public class Robot extends TimedRobot {
           }
 
           if (turn2 == true){
+           if (inpositiontoplacepiece == false){
             if (dpos >-2.16){
               dtmos=.21*direction;
               }
           
               else if (dpos  <= -2.16 ) {
               dtmos=0;
-              
+              inpositiontoplacepiece = true; 
             }
-            if(dpos<-1.2){
+          }
+
+            if(dpos<-1.2 && ppiece2 == false){
               elbow.Esetpoint=-39.071121;
               shoulder.Ssetpoint = 150.377;
               elbow.EkP=0.05;
@@ -586,7 +605,7 @@ public class Robot extends TimedRobot {
               pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kForward);
               ppiece2 = true;
             }
-            if (ppiece2 == true && elbow.Elbowencoder.getPosition()<-30 && ipotpp1 == true){
+            if (ppiece2 == true && elbow.Elbowencoder.getPosition()<-30 && inpositiontoplacepiece == true){
               wrist.Wsetpoint = -20;
             }
 
@@ -597,18 +616,21 @@ public class Robot extends TimedRobot {
 
             if (ppiece2 == true &&Hand.hande.getPosition() > -2){
               wrist.Wsetpoint = 0;
-            
+              placedpiece = true;
             }
+            if (placedpiece == true) {
+              if (dpos >= -1.6){
+                elbow.Esetpoint = 0;
+                shoulder.Ssetpoint = 0;
+                elbow.EkP=0.015;
+                dtmos = 0;
+                }
+            
+                if (dpos < -1.6 ){
+                    dtmos = -.21* direction;
+              }
 
-            if (dpos > -1.6){
-              elbow.Esetpoint = 0;
-              shoulder.Ssetpoint = 0;
-              elbow.EkP=0.015;
-          }
-          
-          if (dpos < -1.6 ){
-              dtmos = -.21* direction;
-          }
+            }
             
 
 
