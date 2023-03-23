@@ -464,11 +464,11 @@ public class Robot extends TimedRobot {
           // this tells it to drive from are starting position till we get up next to the Nodes and it tells it when it is in position
           if ( start_position == true && ipotpp1 == false ) {
               
-              if (dpos > .05){
+              if (dpos > .0){
                   dtmos=.21*direction;
                   }
               
-              else if (dpos < .05) {
+              else if (dpos < .0) {
                   dtmos=0;
                   ipotpp1=true;
               }
@@ -510,11 +510,11 @@ public class Robot extends TimedRobot {
                   armlowered = true;
               }
 
-                if (drivetrain.m_gyro.getYaw() > 1 ){
-               dtmot = -.05 * turndirection;
+                if (drivetrain.m_gyro.getYaw() > .5 ){
+               dtmot = -.02 * turndirection;
                 }
-               else if ( drivetrain.m_gyro.getYaw()  < -1 ){
-               dtmot = .05 * turndirection;
+               else if ( drivetrain.m_gyro.getYaw()  < -.5 ){
+               dtmot = .02 * turndirection;
                
                 }
                 else {
@@ -536,10 +536,10 @@ public class Robot extends TimedRobot {
           
               // this tells us to turn toward the second piece 
           if (taxi == true && turn1 == false){
-              if (drivetrain.m_gyro.getYaw() < 126.7 ){
+              if (drivetrain.m_gyro.getYaw() < 145){
                   dtmot = .21 * turndirection;
               }
-              else if (drivetrain.m_gyro.getYaw() >= 126.7){
+              else if (drivetrain.m_gyro.getYaw() >= 145){
                   dtmot = 0;
                   turn1 = true;
               }
@@ -566,10 +566,10 @@ public class Robot extends TimedRobot {
           if (squezed == true && Hand.hande.getPosition() < -4 && turn2 == false){
            
             
-            if (drivetrain.m_gyro.getAngle() < 360 ){
+            if (drivetrain.m_gyro.getAngle() < 350 ){
               dtmot = .21 * turndirection;
           }
-           if (drivetrain.m_gyro.getAngle() >= 360){
+           if (drivetrain.m_gyro.getAngle() >= 350){
               dtmot = 0;
               turn2 = true;
               wrist.Wsetpoint = 3.8;
@@ -586,17 +586,17 @@ public class Robot extends TimedRobot {
 
           if (turn2 == true){
            if (inpositiontoplacepiece == false){
-            if (dpos >-2.16){
+            if (dpos >-2.){
               dtmos=.21*direction;
               }
           
-              else if (dpos  <= -2.16 ) {
+              else if (dpos  <= -2. ) {
               dtmos=0;
               inpositiontoplacepiece = true; 
             }
           }
-
-            if(dpos<-1.2 && ppiece2 == false){
+            //-1.2
+            if(dpos < 0 && ppiece2 == false){
               elbow.Esetpoint=-39.071121;
               shoulder.Ssetpoint = 150.377;
               elbow.EkP=0.05;
@@ -619,14 +619,14 @@ public class Robot extends TimedRobot {
               placedpiece = true;
             }
             if (placedpiece == true) {
-              if (dpos >= -1.6){
+              if (dpos >= -1.){
                 elbow.Esetpoint = 0;
                 shoulder.Ssetpoint = 0;
                 elbow.EkP=0.015;
                 dtmos = 0;
                 }
             
-                if (dpos < -1.6 ){
+                if (dpos < -1. ){
                     dtmos = -.21* direction;
               }
 
