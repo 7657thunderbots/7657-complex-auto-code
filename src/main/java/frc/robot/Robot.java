@@ -464,11 +464,11 @@ public class Robot extends TimedRobot {
           // this tells it to drive from are starting position till we get up next to the Nodes and it tells it when it is in position
           if ( start_position == true && ipotpp1 == false ) {
               
-              if (dpos > .0){
-                  dtmos=.21*direction;
+              if (dpos > .04){
+                  dtmos=.2*direction;
                   }
               
-              else if (dpos < .0) {
+              else if (dpos < .04) {
                   dtmos=0;
                   ipotpp1=true;
               }
@@ -504,7 +504,7 @@ public class Robot extends TimedRobot {
               }
               
               if (dpos < 3.8 ){
-                  dtmos = -.21* direction;
+                  dtmos = -.27* direction;
               }
               if (elbow.Elbowencoder.getPosition() > -4){
                   armlowered = true;
@@ -525,7 +525,7 @@ public class Robot extends TimedRobot {
               //This speads us up when the arm lowers
           if (armlowered == true && taxi == false){
               if (dpos < 3.9){
-                  dtmos = -.21 * direction;
+                  dtmos = -.35 * direction;
                   }
               else if (dpos >= 3.9){
                   dtmos = 0;
@@ -536,10 +536,10 @@ public class Robot extends TimedRobot {
           
               // this tells us to turn toward the second piece 
           if (taxi == true && turn1 == false){
-              if (drivetrain.m_gyro.getYaw() < 145){
-                  dtmot = .21 * turndirection;
+              if (drivetrain.m_gyro.getYaw() < 126){
+                  dtmot = .25 * turndirection;
               }
-              else if (drivetrain.m_gyro.getYaw() >= 145){
+              else if (drivetrain.m_gyro.getYaw() >= 126){
                   dtmot = 0;
                   turn1 = true;
               }
@@ -548,7 +548,7 @@ public class Robot extends TimedRobot {
             // this tell us to go toward the piece
           if (turn1 == true && inpositionpickup== false){
               if (dpos > 3.1){
-                dtmos = .21 * direction;
+                dtmos = .3 * direction;
                 }
               else if (dpos <= 3.1){
                 dtmos = 0;
@@ -561,18 +561,19 @@ public class Robot extends TimedRobot {
             Hand.hsetpoint=-20;
             pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kForward);
             squezed = true;
+            
           }
 
-          if (squezed == true && Hand.hande.getPosition() < -4 && turn2 == false){
-           
+          if (squezed == true && Hand.hande.getPosition() < -3 && turn2 == false){
+            wrist.Wsetpoint = 3.8;
             
-            if (drivetrain.m_gyro.getAngle() < 350 ){
+            if (drivetrain.m_gyro.getAngle() < 337 ){
               dtmot = .21 * turndirection;
           }
-           if (drivetrain.m_gyro.getAngle() >= 350){
+           if (drivetrain.m_gyro.getAngle() >= 337 ){
               dtmot = 0;
               turn2 = true;
-              wrist.Wsetpoint = 3.8;
+              
           }
             // if (drivetrain.m_gyro.getYaw() > 2 ){
             //   dtmot = -.21 * turndirection;
@@ -587,7 +588,7 @@ public class Robot extends TimedRobot {
           if (turn2 == true){
            if (inpositiontoplacepiece == false){
             if (dpos >-2.){
-              dtmos=.21*direction;
+              dtmos=.35*direction;
               }
           
               else if (dpos  <= -2. ) {
@@ -615,15 +616,15 @@ public class Robot extends TimedRobot {
             }
 
             if (ppiece2 == true &&Hand.hande.getPosition() > -2){
-              wrist.Wsetpoint = 0;
               placedpiece = true;
             }
             if (placedpiece == true) {
-              if (dpos >= -1.){
+              if (dpos >= -1.5){
                 elbow.Esetpoint = 0;
                 shoulder.Ssetpoint = 0;
                 elbow.EkP=0.015;
                 dtmos = 0;
+                wrist.Wsetpoint = 0;
                 }
             
                 if (dpos < -1. ){
