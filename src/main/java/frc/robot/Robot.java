@@ -79,6 +79,8 @@ public class Robot extends TimedRobot {
 
   private static final String kDefaultAuto = "Default";
   private static final String kCustomAuto = "My Auto";
+  private static final String kCustomAuto2 = "my Auto 2";
+  private static final String kCustomAuto3 = "my Auto 3";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private boolean start_position;
@@ -163,8 +165,10 @@ public class Robot extends TimedRobot {
     speed_chooser.addOption("Competition Speed", kCompetitionSpeed);
     SmartDashboard.putData("Speed choices", speed_chooser);
     speedMult = .7;
-    m_chooser.setDefaultOption("2 piece auto", kDefaultAuto);
+    m_chooser.setDefaultOption("Red 2 piece auto", kDefaultAuto);
+    m_chooser.setDefaultOption("1 piece backup auto", kCustomAuto3);
     m_chooser.addOption("Balancing Auto", kCustomAuto);
+    m_chooser.addOption("blue 2 piece", kCustomAuto2);
     SmartDashboard.putData("Auto choices", m_chooser);
      // This creates our drivetrain subsystem that contains all the motors and motor control code
      
@@ -500,20 +504,20 @@ public class Robot extends TimedRobot {
               if (dpos > .35){
                   elbow.Esetpoint = 0;
                   shoulder.Ssetpoint = 0;
-                  elbow.EkP=0.015;
+                  elbow.EkP=0.012;
               }
               
               if (dpos < 3.8 ){
-                  dtmos = -.27* direction;
+                  dtmos = -.21* direction;
               }
-              if (elbow.Elbowencoder.getPosition() > -4){
+              if (elbow.Elbowencoder.getPosition() > -15){
                   armlowered = true;
               }
 
-                if (drivetrain.m_gyro.getYaw() > .5 ){
+                if (drivetrain.m_gyro.getAngle() > .5 ){
                dtmot = -.02 * turndirection;
                 }
-               else if ( drivetrain.m_gyro.getYaw()  < -.5 ){
+               else if ( drivetrain.m_gyro.getAngle()  < -.5 ){
                dtmot = .02 * turndirection;
                
                 }
@@ -532,14 +536,25 @@ public class Robot extends TimedRobot {
                   taxi = true;
               }
 
+              if (drivetrain.m_gyro.getAngle() > .5 ){
+                dtmot = -.02 * turndirection;
+                 }
+                else if ( drivetrain.m_gyro.getAngle()  < -.5 ){
+                dtmot = .02 * turndirection;
+                
+                 }
+                 else {
+                   dtmot = 0;
+                 }
+
           }
           
               // this tells us to turn toward the second piece 
           if (taxi == true && turn1 == false){
-              if (drivetrain.m_gyro.getYaw() < 126){
+              if (drivetrain.m_gyro.getAngle() < 134){
                   dtmot = .25 * turndirection;
               }
-              else if (drivetrain.m_gyro.getYaw() >= 126){
+              else if (drivetrain.m_gyro.getAngle() >= 134){
                   dtmot = 0;
                   turn1 = true;
               }
@@ -587,14 +602,25 @@ public class Robot extends TimedRobot {
 
           if (turn2 == true){
            if (inpositiontoplacepiece == false){
-            if (dpos >-2.){
+            if (dpos >-2.45){
               dtmos=.35*direction;
               }
           
-              else if (dpos  <= -2. ) {
+              else if (dpos  <= -2.45 ) {
               dtmos=0;
               inpositiontoplacepiece = true; 
             }
+
+            if (drivetrain.m_gyro.getAngle() > 361 ){
+              dtmot = -.02 * turndirection;
+               }
+              else if ( drivetrain.m_gyro.getAngle()  < 359 ){
+              dtmot = .02 * turndirection;
+              
+               }
+               else {
+                 dtmot = 0;
+               }
           }
             //-1.2
             if(dpos < 0 && ppiece2 == false){
@@ -619,15 +645,15 @@ public class Robot extends TimedRobot {
               placedpiece = true;
             }
             if (placedpiece == true) {
-              if (dpos >= -1.5){
+              if (dpos >= -2){
                 elbow.Esetpoint = 0;
                 shoulder.Ssetpoint = 0;
-                elbow.EkP=0.015;
+                elbow.EkP=0.012;
                 dtmos = 0;
                 wrist.Wsetpoint = 0;
                 }
             
-                if (dpos < -1. ){
+                if (dpos < -1.5 ){
                     dtmos = -.21* direction;
               }
 
@@ -637,11 +663,359 @@ public class Robot extends TimedRobot {
 
           }
       
-
-      drivetrain.tankDrive(-dtmot+dtmos, dtmot+dtmos, false);
-     
+         
+            drivetrain.tankDrive(-dtmot+dtmos, dtmot+dtmos, false);
+       
         break;
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+
+        case kCustomAuto2:
+          dpos = drivetrain.getAverageEncoderDistance();
+       
+          //this tells the arm at the start of auto 1 to go up
+          if (start_position==false){
+              elbow.Esetpoint=-39.071121;
+              shoulder.Ssetpoint = 150.377;
+              elbow.EkP=0.05;
+              wrist.Wsetpoint=2.8;
+              start_position=true;
+              Hand.hsetpoint=-20;
+              pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kForward);
+          }
+          
+          // this tells it to drive from are starting position till we get up next to the Nodes and it tells it when it is in position
+          if ( start_position == true && ipotpp1 == false ) {
+              
+              if (dpos > .04){
+                  dtmos=.2*direction;
+                  }
+              
+              else if (dpos < .04) {
+                  dtmos=0;
+                  ipotpp1=true;
+              }
+
+          
+          }
+
+              // this tells the wrist to go down
+          if (wipc == false  && elbow.Elbowencoder.getPosition()<-30 && ipotpp1 == true){
+              wrist.Wsetpoint = -20;
+              wipc = true;
+          }
+          
+          // this tells the hand to open.
+          if (wipc == true && wrist.wriste.getPosition() < -17 && rc1 == false){
+              Hand.hsetpoint = 1;
+              pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+              rc1 = true;
+          }
+          
+          // This command tells it to flip up the wrist because we have released
+          if (rc1 == true && Hand.hande.getPosition() > -2){
+              wrist.Wsetpoint = 0;
+              backtolowerarm = true;
+          }
+          
+          // This command tells us to back up and then lower the arm
+          if (backtolowerarm == true && armlowered == false){
+              if (dpos > .35){
+                  elbow.Esetpoint = 0;
+                  shoulder.Ssetpoint = 0;
+                  elbow.EkP=0.012;
+              }
+              
+              if (dpos < 3.8 ){
+                  dtmos = -.21* direction;
+              }
+              if (elbow.Elbowencoder.getPosition() > -15){
+                  armlowered = true;
+              }
+
+                if (drivetrain.m_gyro.getAngle() > .5 ){
+               dtmot = -.02 * turndirection;
+                }
+               else if ( drivetrain.m_gyro.getAngle()  < -.5 ){
+               dtmot = .02 * turndirection;
+               
+                }
+                else {
+                  dtmot = 0;
+                }
+          }
+
+              //This speads us up when the arm lowers
+          if (armlowered == true && taxi == false){
+              if (dpos < 3.9){
+                  dtmos = -.35 * direction;
+                  }
+              else if (dpos >= 3.9){
+                  dtmos = 0;
+                  taxi = true;
+              }
+
+              if (drivetrain.m_gyro.getAngle() > .5 ){
+                dtmot = -.02 * turndirection;
+                 }
+                else if ( drivetrain.m_gyro.getAngle()  < -.5 ){
+                dtmot = .02 * turndirection;
+                
+                 }
+                 else {
+                   dtmot = 0;
+                 }
+
+          }
+          
+              // this tells us to turn toward the second piece 
+          if (taxi == true && turn1 == false){
+              if (drivetrain.m_gyro.getAngle() > -128){
+                  dtmot = -.25 * turndirection;
+              }
+              else if (drivetrain.m_gyro.getAngle() <= -128){
+                  dtmot = 0;
+                  turn1 = true;
+              }
+          }
+          dpos = drivetrain.getAverageEncoderDistance();
+            // this tell us to go toward the piece
+          if (turn1 == true && inpositionpickup== false){
+              if (dpos > 3.1){
+                dtmos = .3 * direction;
+                }
+              else if (dpos <= 3.1){
+                dtmos = 0;
+                inpositionpickup = true;
+              }
+              
+          }
+
+          if (inpositionpickup == true && squezed == false){
+            Hand.hsetpoint=-20;
+            pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kForward);
+            squezed = true;
+            
+          }
+
+          if (squezed == true && Hand.hande.getPosition() < -3 && turn2 == false){
+            wrist.Wsetpoint = 3.8;
+            
+            if (drivetrain.m_gyro.getAngle() > -336 ){
+              dtmot = -.21 * turndirection;
+          }
+           if (drivetrain.m_gyro.getAngle() <= -336 ){
+              dtmot = 0;
+              turn2 = true;
+              
+          }
+            // if (drivetrain.m_gyro.getYaw() > 2 ){
+            //   dtmot = -.21 * turndirection;
+            //   }
+            //   else if ( drivetrain.m_gyro.getYaw() <= 2){
+            //   dtmot = 0;
+            //   turn2 = true;
+            // }
+
+          }
+
+          if (turn2 == true){
+           if (inpositiontoplacepiece == false){
+            if (dpos >-2.45){
+              dtmos=.35*direction;
+              }
+          
+              else if (dpos  <= -2.45 ) {
+              dtmos=0;
+              inpositiontoplacepiece = true; 
+            }
+
+            if (drivetrain.m_gyro.getAngle() < -360 ){
+              dtmot = .02 * turndirection;
+               }
+              else if ( drivetrain.m_gyro.getAngle()  > -358 ){
+              dtmot = -.02 * turndirection;
+              
+               }
+               else {
+                 dtmot = 0;
+               }
+          }
+            //-1.2
+            if(dpos < 0 && ppiece2 == false){
+              elbow.Esetpoint=-39.071121;
+              shoulder.Ssetpoint = 150.377;
+              elbow.EkP=0.05;
+              wrist.Wsetpoint=2.8;
+              Hand.hsetpoint=-20;
+              pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kForward);
+              ppiece2 = true;
+            }
+            if (ppiece2 == true && elbow.Elbowencoder.getPosition()<-30 && inpositiontoplacepiece == true){
+              wrist.Wsetpoint = -20;
+            }
+
+            if (ppiece2 == true &&  wrist.wriste.getPosition() < -17 ){
+              Hand.hsetpoint = 1;
+              pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+            }
+
+            if (ppiece2 == true &&Hand.hande.getPosition() > -2){
+              placedpiece = true;
+            }
+            if (placedpiece == true) {
+              if (dpos >= -2){
+                elbow.Esetpoint = 0;
+                shoulder.Ssetpoint = 0;
+                elbow.EkP=0.012;
+                dtmos = 0;
+                wrist.Wsetpoint = 0;
+                }
+            
+                if (dpos < -1.5 ){
+                    dtmos = -.21* direction;
+              }
+
+            }
+            
+
+
+          }
       
+         
+            drivetrain.tankDrive(-dtmot+dtmos, dtmot+dtmos, false);
+       
+        break;
+
+
+
+
+
+
+
+
+
+
+
+        case kCustomAuto3:
+        dpos = drivetrain.getAverageEncoderDistance();
+     
+        //this tells the arm at the start of auto 1 to go up
+        if (start_position==false){
+            elbow.Esetpoint=-39.071121;
+            shoulder.Ssetpoint = 150.377;
+            elbow.EkP=0.05;
+            wrist.Wsetpoint=2.8;
+            start_position=true;
+            Hand.hsetpoint=-20;
+            pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kForward);
+        }
+        
+        // this tells it to drive from are starting position till we get up next to the Nodes and it tells it when it is in position
+        if ( start_position == true && ipotpp1 == false ) {
+            
+            if (dpos > .04){
+                dtmos=.2*direction;
+                }
+            
+            else if (dpos < .04) {
+                dtmos=0;
+                ipotpp1=true;
+            }
+
+        
+        }
+
+            // this tells the wrist to go down
+        if (wipc == false  && elbow.Elbowencoder.getPosition()<-30 && ipotpp1 == true){
+            wrist.Wsetpoint = -20;
+            wipc = true;
+        }
+        
+        // this tells the hand to open.
+        if (wipc == true && wrist.wriste.getPosition() < -17 && rc1 == false){
+            Hand.hsetpoint = 1;
+            pneumatics.mdoubleSolenoid.set(DoubleSolenoid.Value.kReverse);
+            rc1 = true;
+        }
+        
+        // This command tells it to flip up the wrist because we have released
+        if (rc1 == true && Hand.hande.getPosition() > -2){
+            wrist.Wsetpoint = 0;
+            backtolowerarm = true;
+        }
+        
+        // This command tells us to back up and then lower the arm
+        if (backtolowerarm == true && armlowered == false){
+            if (dpos > .35){
+                elbow.Esetpoint = 0;
+                shoulder.Ssetpoint = 0;
+                elbow.EkP=0.012;
+            }
+            
+            if (dpos < 3.8 ){
+                dtmos = -.21* direction;
+            }
+            if (elbow.Elbowencoder.getPosition() > -15){
+                armlowered = true;
+            }
+
+              if (drivetrain.m_gyro.getAngle() > .5 ){
+             dtmot = -.02 * turndirection;
+              }
+             else if ( drivetrain.m_gyro.getAngle()  < -.5 ){
+             dtmot = .02 * turndirection;
+             
+              }
+              else {
+                dtmot = 0;
+              }
+        }
+
+            //This speads us up when the arm lowers
+        if (armlowered == true && taxi == false){
+            if (dpos < 3.9){
+                dtmos = -.35 * direction;
+                }
+            else if (dpos >= 3.9){
+                dtmos = 0;
+                taxi = true;
+            }
+
+            if (drivetrain.m_gyro.getAngle() > .5 ){
+              dtmot = -.02 * turndirection;
+               }
+              else if ( drivetrain.m_gyro.getAngle()  < -.5 ){
+              dtmot = .02 * turndirection;
+              
+               }
+               else {
+                 dtmot = 0;
+               }
+
+        }
+      break;
     
     }
   }
@@ -746,15 +1120,15 @@ drivetrain.setbrake(true);
             lastTimestamp = Timer.getFPGATimestamp();
             lastError = berror;
             
-            if (drivetrain.m_gyro.getYaw()>3){
-              turn = .05;
-              }
-               if (drivetrain.m_gyro.getYaw()<2.5 && drivetrain.m_gyro.getYaw() >-2.5){
-              turn=0;
-             }
-              else if (drivetrain.m_gyro.getYaw()<-3){
-                turn =-.05;
-            }
+            // if (drivetrain.m_gyro.getYaw()>3){
+            //   turn = .05;
+            //   }
+            //    if (drivetrain.m_gyro.getYaw()<2.5 && drivetrain.m_gyro.getYaw() >-2.5){
+            //   turn=0;
+            //  }
+            //   else if (drivetrain.m_gyro.getYaw()<-3){
+            //     turn =-.05;
+            // }
   
             if (Speedvar>.2){
               Speedvar=.2;
@@ -764,8 +1138,9 @@ drivetrain.setbrake(true);
     
                double directionL= Speedvar;
                double directionR= Speedvar;
-               drivetrain.tankDrive(directionL+turn, directionR-turn, false);
+               drivetrain.tankDrive(directionL, directionR, false);
             }
+            
           else if(left.getTrigger()){
             drivetrain.arcadeDrive(left.getY()*speedMult,right.getX()*speedMult, false);
           }
