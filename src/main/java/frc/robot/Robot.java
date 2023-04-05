@@ -1015,6 +1015,8 @@ public class Robot extends TimedRobot {
                }
 
         }
+
+        drivetrain.tankDrive(-dtmot+dtmos, dtmot+dtmos, false);
       break;
     
     }
@@ -1038,11 +1040,16 @@ drivetrain.setbrake(true);
 
 
                 if (speed_selected == kDefaultSpeed) {
-                        MaxDriveSpeed = 0.3;
-                        speedMult = .4;
-                } else {
                         MaxDriveSpeed = 0.6;
-                        speedMult= .6;
+                        speedMult = .6;
+                }
+                 else if (left.getTrigger()){
+                  speedMult = 1;
+                  MaxDriveSpeed = 1;
+                }
+                    else if(speed_selected == kCompetitionSpeed){
+                        MaxDriveSpeed = 0.6;
+                        speedMult = .6;
                 }
 
 
@@ -1141,9 +1148,6 @@ drivetrain.setbrake(true);
                drivetrain.tankDrive(directionL, directionR, false);
             }
             
-          else if(left.getTrigger()){
-            drivetrain.arcadeDrive(left.getY()*speedMult,right.getX()*speedMult, false);
-          }
           else {
             drivetrain.tankDrive(left.getY()*speedMult, right.getY()*speedMult, false);
             
